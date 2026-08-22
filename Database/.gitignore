@@ -1,0 +1,4 @@
+data/store.json
+tests/test-store-*.json
+.env
+node_modules
