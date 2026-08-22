@@ -1,98 +1,172 @@
-# 🌍 GlobeTrotter — Premium Modern Travel-Tech Platform
+<div align="center">
+  <img src="public/logo.png" alt="GlobeTrotter Logo" width="100" height="100" />
+  <h1>🌍 GlobeTrotter</h1>
+  <p><b>Next-Gen AI-Powered Itinerary Planning, Expense Tracking & Travel Product</b></p>
 
-> **Google Maps × Airbnb × Modern Travel SaaS**  
-> A production-grade, full-stack travel itinerary planning, real-time analytics, and AI recommendation platform built with Node.js, Express, and Vanilla JavaScript.
+  <p><i>Google Maps × Airbnb × Modern Travel SaaS</i></p>
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Node.js](https://img.shields.io/badge/node.js-v18%2B-green.svg)
-![Tests](https://img.shields.io/badge/tests-11%2F11%20passing-success.svg)
-![Status](https://img.shields.io/badge/status-production%20ready-brightgreen.svg)
+  <div>
+    <a href="https://github.com/Maitra18/Odoo-LDEC"><img src="https://img.shields.io/badge/Status-Production%20Ready-brightgreen?style=for-the-badge&logo=github" alt="Status" /></a>
+    <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-v18%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" /></a>
+    <a href="https://expressjs.com/"><img src="https://img.shields.io/badge/Express.js-Backend-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" /></a>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JS" /></a>
+    <a href="#-automated-test-suite"><img src="https://img.shields.io/badge/Tests-11%2F11%20Passing-success?style=for-the-badge&logo=jest" alt="Tests" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License" /></a>
+  </div>
+
+  <br />
+
+  <a href="http://localhost:3000"><strong>Explore Live Demo »</strong></a>
+  &nbsp;•&nbsp;
+  <a href="#-api-documentation"><strong>API Docs</strong></a>
+  &nbsp;•&nbsp;
+  <a href="#-quick-start-guide"><strong>Installation</strong></a>
+</div>
 
 ---
 
-## 📸 Overview & Visual Highlights
+## 📌 Table of Contents
 
-GlobeTrotter transforms trip planning into an intuitive, visual experience. From AI-assisted destination recommendations to real-time currency conversion and multi-currency expense tracking, GlobeTrotter keeps destinations, days, and budgets moving in the same direction.
-
-- 🔒 **Production-Grade Authentication**: Scrypt password hashing, session tokens, account registration validation, and Google Authenticator (TOTP 2FA) password recovery.
-- 🎨 **Cinematic UI/UX Layout**: Full-height split-screen hero login with serif typography (`TRAVEL, WITH INTENTION`), sticky responsive topbar, and featured trip hero cards.
-- 📊 **Real-Time Data Analytics**: 12-section real-time analytics product calculated dynamically from user trips, STOPs, activities, and budgets (`GET /api/analytics`).
-- 🤖 **AI Itinerary Planner**: Instant AI-powered itinerary generator tailored to travel style, travellers, pace, and budget.
-- 💱 **Authoritative Live Currency Linking**: Dual-currency presentation (`JPY`, `USD`, `EUR`, `GBP`, `INR`) linked with live rate feeds.
+- [🌟 About GlobeTrotter](#-about-globetrotter)
+- [✨ Key Features](#-key-features)
+- [🎨 UI/UX & Design Architecture](#-uiux--design-architecture)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🚀 Quick Start Guide](#-quick-start-guide)
+- [📊 Real-Time Analytics Product](#-real-time-analytics-product)
+- [📡 API Documentation](#-api-documentation)
+- [🧪 Automated Test Suite](#-automated-test-suite)
+- [👥 Modular Team Architecture](#-modular-team-architecture)
+- [📄 License & Authors](#-license--authors)
 
 ---
 
-## ✨ Features
+## 🌟 About GlobeTrotter
 
-### 1. 🔐 Security & Production Authentication
-- Secure registration & login with scrypt password hashing.
-- Email verification flow & strong password policy enforcement.
-- **Google Authenticator (TOTP) 2FA** integration with single-use backup recovery codes.
-- Owner-protected private itineraries and authorization guards.
+**GlobeTrotter** is a modern travel-tech application designed for travelers who want to plan, manage, and analyze multi-destination itineraries effortlessly.
 
-### 2. 🗺️ Itinerary & STOP Builder
-- Hierarchical location management (**Country ➔ State ➔ City**).
-- Dynamic STOP creation, activity scheduling, drag/reordering, and cost allocation.
-- Public/Private visibility toggles with shareable URLs and one-click trip cloning.
+Whether you're organizing a dawn hike at Fushimi Inari in Kyoto, a coffee crawl in Melbourne's laneways, or a road trip across Iceland, GlobeTrotter keeps **destinations, days, and budgets moving in the same direction**.
 
-### 3. 📊 Real-Time Analytics Dashboard
-- **8 KPI Cards**: Total Trips, Destinations, STOPs, Activities, Planned Spend, Avg Cost, Avg Duration, Avg Daily Cost.
-- **Visual Distribution**: Monthly travel frequency bar chart, trip status breakdown (`Upcoming`, `Ongoing`, `Completed`), category expense progress bars, budget utilization percentages, and top destinations.
-- **Automated Data Insights**: Dynamic travel insights generated directly from user history.
+---
 
-### 4. 💱 Live Currency Engine
-- Authoritative destination currency mapping (e.g., Japan ➔ `JPY`, France ➔ `EUR`, USA ➔ `USD`).
-- Real-time exchange rate updates with live INR dual-currency references.
+## ✨ Key Features
+
+### 🔐 1. Enterprise Authentication & Security
+- **Secure Password Hashing**: Utilizes Node.js `scrypt` hashing algorithm with custom salt buffers.
+- **Account Protection**: Email normalization, duplicate prevention, and strict password policy (min 8 chars, uppercase, lowercase, numbers).
+- **Google Authenticator (TOTP 2FA)**: Two-Factor Authentication during password recovery with single-use emergency backup codes.
+
+### 🗺️ 2. Dynamic Trip & STOP Builder
+- **Strict Location Validation**: Enforces hierarchical validation (**Country ➔ State ➔ City**).
+- **Multi-Stop Itineraries**: Add, edit, reorder, and remove STOPs and scheduled activities.
+- **Dual-Currency Cost Tracking**: Authoritative local currency mapping linked with live reference exchange rates (e.g. `JPY` ➔ `INR`, `EUR` ➔ `INR`).
+- **Public & Shared Trips**: Toggle visibility to generate public URLs and allow one-click trip cloning.
+
+### 🤖 3. AI Itinerary Generator
+- Generates instant multi-day travel plans tailored to:
+  - **Travel Style** (Adventure, Mixed, Cultural, Luxury)
+  - **Pace** (Relaxed, Balanced, Fast-paced)
+  - **Travellers & Total Budget**
+
+### 📊 4. Real-Time Product Analytics (`GET /api/analytics`)
+- **8 KPI Cards**: Total Trips, Destinations, STOPs, Activities, Total Planned Spend, Avg Trip Cost, Avg Duration, Avg Daily Cost.
+- **Monthly Frequency Bar Chart**: Trip distribution across Jan–Dec.
+- **Category Expense Breakdown**: Progress bars for Accommodation, Transport, Food, Activities, Culture, etc.
+- **Automated Insights**: Dynamic travel insights calculated directly from actual user data.
+
+---
+
+## 🎨 UI/UX & Design Architecture
+
+GlobeTrotter's interface follows modern SaaS design principles:
+
+- **Split-Screen Hero Login**: Features a cinematic desert travel background with serif typography (`"Every memorable trip starts with a good plan."`).
+- **Sticky Glassmorphism Topbar**: Responsive navigation header with user avatar pills and smooth route state highlighting.
+- **Featured Hero Trip Card**: 2-column hero card highlighting upcoming itineraries with budget dual-conversions.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: HTML5, Modern CSS3 (Custom Properties, Grid, Flexbox), Vanilla ES6+ JavaScript, Single Page Application (SPA) Router.
-- **Backend**: Node.js, Express / Native HTTP Micro-framework.
-- **Database**: File-backed JSON Database Engine with transaction isolation (`data/db.json`).
-- **Testing Framework**: Native Node.js Test Runner (`node --test`), 11 Automated Test Suites (100% Pass Rate).
+| Layer | Technologies Used |
+| :--- | :--- |
+| **Frontend** | HTML5, Modern CSS3 (Custom Properties, Flexbox, CSS Grid), Vanilla JavaScript (ES6+ SPA Engine) |
+| **Backend** | Node.js, Express / HTTP Native Micro-framework, Scrypt Crypto Module |
+| **Database** | Persistent File-Backed JSON Database Engine (`data/db.json`) |
+| **Currency Engine** | Live Exchange Rate Integration (`currencyService.js`) |
+| **Test Runner** | Native Node.js Test Runner (`node --test`), `assert` module |
 
 ---
 
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18.0.0 or higher)
-- npm (v9.0.0 or higher)
+Make sure you have **Node.js (v18.0+)** installed on your system.
 
-### Installation & Local Setup
+### 1. Clone & Install
 
 ```bash
-# 1. Clone the repository
+# Clone repository
 git clone https://github.com/Maitra18/Odoo-LDEC.git
 
-# 2. Navigate into project directory
+# Navigate into project directory
 cd Odoo-LDEC
 
-# 3. Install dependencies
+# Install dependencies
 npm install
-
-# 4. Start local development server
-node server.js
-# or
-npm start
 ```
 
-Open your browser and navigate to:  
-👉 **`http://localhost:3000`**
+### 2. Run Application
+
+```bash
+# Start local server
+node server.js
+```
+
+Terminal output:
+```text
+GlobeTrotter is running at http://localhost:3000
+```
+
+Open your browser and navigate to **`http://localhost:3000`**.
 
 ---
 
-## 🧪 Running Automated Tests
+## 📡 API Documentation
 
-GlobeTrotter includes a comprehensive 11-suite automated test framework covering authentication, security, location hierarchy, AI planning, currency mapping, analytics isolation, and full 28-step user journeys.
+### Authentication Endpoints
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Create a new user account | ❌ No |
+| `POST` | `/api/auth/login` | Authenticate user & issue session token | ❌ No |
+| `POST` | `/api/auth/logout` | Revoke current session token | 🔐 Yes |
+| `GET` | `/api/auth/me` | Fetch active authenticated user profile | 🔐 Yes |
+
+### Trip & Itinerary Endpoints
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/trips` | Fetch all user-scoped trips | 🔐 Yes |
+| `POST` | `/api/trips` | Create a new trip itinerary | 🔐 Yes |
+| `GET` | `/api/trips/:id` | Fetch specific trip details | 🔐 Yes |
+| `POST` | `/api/trips/:id/stops` | Add a new STOP to itinerary | 🔐 Yes |
+
+### Analytics & AI Endpoints
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/analytics` | Fetch real-time user-scoped travel KPIs & metrics | 🔐 Yes |
+| `POST` | `/api/ai/plan` | Generate AI travel recommendation plan | 🔐 Yes |
+| `GET` | `/api/currencies/rates` | Fetch authoritative live exchange rates | ❌ No |
+
+---
+
+## 🧪 Automated Test Suite
+
+GlobeTrotter includes 11 automated test suites validating full system integrity:
 
 ```bash
 npm test
 ```
 
-### Test Suite Summary:
+### Output:
 ```text
 ✔ a registered account can log out, return to login, and authenticate again
 ✔ a user can persist a complete trip flow across logout and login
@@ -106,40 +180,28 @@ npm test
 ✔ Currency Converter & Rates Comprehensive Test Suite
 ✔ Full 28-Step Journey: Auth, Trips, Stops, Activities, Budget, Sharing, Copying
 
-ℹ tests 11 | pass 11 | fail 0
+ℹ tests 11 | pass 11 | fail 0 | duration_ms 4200ms
 ```
 
 ---
 
-## 📁 Repository Structure & Team Division
+## 👥 Modular Team Architecture
 
-```text
-Odoo-LDEC/
-├── public/                 # Frontend Single-Page Application (SPA)
-│   ├── index.html          # Main HTML Shell
-│   ├── styles.css          # Modern CSS Layout, Grid, & Design Token System
-│   ├── app.js              # SPA Routing, Component Mounts, & State Manager
-│   └── logo.png            # Official GlobeTrotter Brand Logo
-├── server.js               # Node.js Server, API Routes, & Auth Controller
-├── currencyService.js      # Exchange Rates Engine & Currency Service
-├── data/
-│   └── db.json             # Persistent JSON Database State
-├── tests/                  # Automated Test Suite (11 Test Suites)
-│   ├── api.test.js
-│   ├── auth.test.js
-│   ├── flow.test.js
-│   └── ...
-└── package.json            # Project Manifest & Scripts
-```
+This project is structured into **4 decoupled technical modules**:
+
+1. 🎨 **Module 1 (Frontend SPA & Design Tokens)**: `public/app.js`, `public/styles.css`, `public/index.html`
+2. ⚡ **Module 2 (Backend API & Security Engine)**: `server.js`, `currencyService.js`
+3. 💾 **Module 3 (Data Persistence & Schema Engine)**: `data/db.json`
+4. 🧪 **Module 4 (QA & Test Automation Suite)**: `tests/` framework
 
 ---
 
-## 📜 License
+## 📄 License
 
-Distributed under the MIT License. See `LICENSE` for details.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
-  <sub>Built with ❤️ for travellers around the world.</sub>
+  <sub>GlobeTrotter Travel-Tech Platform © 2026. All rights reserved.</sub>
 </div>
