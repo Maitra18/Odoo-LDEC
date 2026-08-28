@@ -470,6 +470,8 @@ function dashboardImpl() {
       </div>
     </section>
 
+    ${render3DGlobeSection()}
+
     ${featuredTrip ? `
       <section class="section">
         <div class="section-title">
@@ -554,6 +556,11 @@ function dashboardImpl() {
       </div>
     </section>
   `, 'dashboard'));
+
+  setTimeout(() => {
+    init3DGlobe();
+    init3DTilt();
+  }, 50);
 }
 
 function authError(message) {
@@ -3238,8 +3245,314 @@ async function render() {
       authPage('login');
     }
   }
+
+  setTimeout(() => {
+    init3DTilt();
+  }, 100);
 }
 
 window.addEventListener('hashchange', render);
 window.addEventListener('load', render);
 render();
+
+/* ==================================================
+   3D INTERACTIVE ENGINE (Three.js WebGL & Canvas 3D Fallback + 3D Tilt)
+   ================================================== */
+
+function init3DTilt() {
+  const cards = document.querySelectorAll('.card, .trip-card, .featured-trip-card, .stat, .experience-card, .stats-bar');
+  cards.forEach(card => {
+    if (card.dataset.tiltBound) return;
+    card.dataset.tiltBound = 'true';
+    card.classList.add('tilt-3d');
+
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotX = ((y - centerY) / centerY) * -7;
+      const rotY = ((x - centerX) / centerX) * 7;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    });
+  });
+}
+
+function render3DGlobeSection() {
+  return `
+    <section class="globe-3d-section card">
+      <div class="globe-3d-layout">
+        <div>
+          <div class="globe-badge-3d">🌐 3D Interactive World Engine</div>
+          <h2 style="font-size:28px;font-weight:800;margin:0 0 10px 0;letter-spacing:-0.02em;color:#ffffff">Explore Destinations in 3D</h2>
+          <p style="color:rgba(255,255,255,0.85);font-size:14.5px;line-height:1.5">Interactive 3D globe with WebGL rendering, location markers, and 3D flight paths. Drag to rotate, zoom, and select location pins to explore global itineraries.</p>
+          <div class="globe-pins-list">
+            <button class="globe-pin-item active" data-lat="35.6762" data-lng="139.6503" data-name="Tokyo">📍 Tokyo, Japan</button>
+            <button class="globe-pin-item" data-lat="48.8566" data-lng="2.3522" data-name="Paris">📍 Paris, France</button>
+            <button class="globe-pin-item" data-lat="38.7223" data-lng="-9.1393" data-name="Lisbon">📍 Lisbon, Portugal</button>
+            <button class="globe-pin-item" data-lat="41.9028" data-lng="12.4964" data-name="Rome">📍 Rome, Italy</button>
+            <button class="globe-pin-item" data-lat="64.1466" data-lng="-21.9426" data-name="Reykjavik">📍 Reykjavik, Iceland</button>
+            <button class="globe-pin-item" data-lat="-33.9249" data-lng="18.4241" data-name="Cape Town">📍 Cape Town, South Africa</button>
+          </div>
+        </div>
+        <div class="globe-3d-canvas-wrap" id="globe-3d-container">
+          <canvas id="globe-3d-canvas"></canvas>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function init3DGlobe() {
+  const canvas = document.getElementById('globe-3d-canvas');
+  const container = document.getElementById('globe-3d-container');
+  if (!canvas || !container) return;
+
+  const width = container.clientWidth || 400;
+  const height = container.clientHeight || 380;
+  canvas.width = width;
+  canvas.height = height;
+
+  // 1. Check if Three.js WebGL is available
+  if (typeof THREE !== 'undefined') {
+    try {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.z = 5.2;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // 3D Globe Sphere
+      const sphereGeo = new THREE.SphereGeometry(1.8, 64, 64);
+      const sphereMat = new THREE.MeshPhongMaterial({
+        color: 0x0f4c4a,
+        emissive: 0x071e1d,
+        specular: 0x2dd4bf,
+        shininess: 30,
+        wireframe: false,
+        transparent: true,
+        opacity: 0.92
+      });
+      const globe = new THREE.Mesh(sphereGeo, sphereMat);
+      scene.add(globe);
+
+      // 3D Wireframe Grid Overlay
+      const wireGeo = new THREE.SphereGeometry(1.81, 24, 24);
+      const wireMat = new THREE.MeshBasicMaterial({
+        color: 0x38bdf8,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.18
+      });
+      const wireframe = new THREE.Mesh(wireGeo, wireMat);
+      globe.add(wireframe);
+
+      // Atmosphere Glow Halo
+      const haloGeo = new THREE.SphereGeometry(1.95, 32, 32);
+      const haloMat = new THREE.MeshBasicMaterial({
+        color: 0x14b8a6,
+        side: THREE.BackSide,
+        transparent: true,
+        opacity: 0.15
+      });
+      const halo = new THREE.Mesh(haloGeo, haloMat);
+      scene.add(halo);
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+      scene.add(ambientLight);
+
+      const dirLight1 = new THREE.DirectionalLight(0x38bdf8, 1.2);
+      dirLight1.position.set(5, 3, 5);
+      scene.add(dirLight1);
+
+      const dirLight2 = new THREE.DirectionalLight(0xf97316, 0.8);
+      dirLight2.position.set(-5, -3, -5);
+      scene.add(dirLight2);
+
+      // 3D Location Pins
+      const pinsData = [
+        { lat: 35.6762, lng: 139.6503, name: 'Tokyo', color: 0xf97316 },
+        { lat: 48.8566, lng: 2.3522, name: 'Paris', color: 0x38bdf8 },
+        { lat: 38.7223, lng: -9.1393, name: 'Lisbon', color: 0x10b981 },
+        { lat: 41.9028, lng: 12.4964, name: 'Rome', color: 0xf59e0b },
+        { lat: 64.1466, lng: -21.9426, name: 'Reykjavik', color: 0xa855f7 },
+        { lat: -33.9249, lng: 18.4241, name: 'Cape Town', color: 0xec4899 }
+      ];
+
+      const pinGroup = new THREE.Group();
+      pinsData.forEach(p => {
+        const phi = (90 - p.lat) * (Math.PI / 180);
+        const theta = (p.lng + 180) * (Math.PI / 180);
+
+        const r = 1.82;
+        const x = -(r * Math.sin(phi) * Math.cos(theta));
+        const z = r * Math.sin(phi) * Math.sin(theta);
+        const y = r * Math.cos(phi);
+
+        const pinGeo = new THREE.ConeGeometry(0.04, 0.22, 16);
+        const pinMat = new THREE.MeshBasicMaterial({ color: p.color });
+        const pinMesh = new THREE.Mesh(pinGeo, pinMat);
+
+        pinMesh.position.set(x, y, z);
+        pinMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(x, y, z).normalize());
+        pinGroup.add(pinMesh);
+      });
+      globe.add(pinGroup);
+
+      // Orbiting 3D Ring Line
+      const orbitCurve = new THREE.EllipseCurve(0, 0, 2.3, 2.3, 0, 2 * Math.PI, false, 0);
+      const pointsArr = orbitCurve.getPoints(64);
+      const orbitGeo = new THREE.BufferGeometry().setFromPoints(pointsArr.map(p => new THREE.Vector3(p.x, p.y, 0)));
+      const orbitMat = new THREE.LineDashedMaterial({ color: 0xf97316, dashSize: 0.1, gapSize: 0.05 });
+      const orbitLine = new THREE.Line(orbitGeo, orbitMat);
+      orbitLine.rotation.x = Math.PI / 3;
+      orbitLine.computeLineDistances();
+      scene.add(orbitLine);
+
+      // Orbiting Airplane Mesh
+      const planeGeo = new THREE.SphereGeometry(0.06, 16, 16);
+      const planeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const planeMesh = new THREE.Mesh(planeGeo, planeMat);
+      scene.add(planeMesh);
+
+      let isDragging = false;
+      let previousMousePosition = { x: 0, y: 0 };
+      let rotSpeedX = 0;
+      let rotSpeedY = 0.003;
+
+      canvas.addEventListener('mousedown', e => {
+        isDragging = true;
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
+
+        rotSpeedY = deltaX * 0.005;
+        rotSpeedX = deltaY * 0.005;
+
+        globe.rotation.y += rotSpeedY;
+        globe.rotation.x += rotSpeedX;
+
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('mouseup', () => { isDragging = false; });
+
+      // Handle Pin Buttons Click
+      document.querySelectorAll('.globe-pin-item').forEach(btn => {
+        btn.onclick = () => {
+          document.querySelectorAll('.globe-pin-item').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const lat = parseFloat(btn.dataset.lat);
+          const lng = parseFloat(btn.dataset.lng);
+
+          const targetRotY = -(lng * Math.PI / 180) - Math.PI / 2;
+          const targetRotX = (lat * Math.PI / 180);
+
+          globe.rotation.y = targetRotY;
+          globe.rotation.x = targetRotX;
+        };
+      });
+
+      let orbitAngle = 0;
+      function animate() {
+        requestAnimationFrame(animate);
+
+        if (!isDragging) {
+          globe.rotation.y += rotSpeedY * 0.95;
+          globe.rotation.x += rotSpeedX * 0.95;
+          if (Math.abs(rotSpeedY) < 0.002) rotSpeedY = 0.0025;
+          rotSpeedX *= 0.95;
+        }
+
+        orbitAngle += 0.015;
+        planeMesh.position.x = 2.3 * Math.cos(orbitAngle);
+        planeMesh.position.y = 2.3 * Math.sin(orbitAngle) * Math.cos(Math.PI / 3);
+        planeMesh.position.z = 2.3 * Math.sin(orbitAngle) * Math.sin(Math.PI / 3);
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+      return;
+    } catch (e) {
+      console.warn('Three.js WebGL fallback:', e);
+    }
+  }
+
+  // 2. Procedural Native 3D Canvas Fallback
+  const ctx = canvas.getContext('2d');
+  let angleY = 0;
+  let isDragging = false;
+  let startX = 0;
+
+  canvas.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX; });
+  window.addEventListener('mousemove', e => {
+    if (isDragging) {
+      angleY += (e.clientX - startX) * 0.01;
+      startX = e.clientX;
+    }
+  });
+  window.addEventListener('mouseup', () => { isDragging = false; });
+
+  function drawCanvasGlobe() {
+    ctx.clearRect(0, 0, width, height);
+    const cx = width / 2;
+    const cy = height / 2;
+    const r = Math.min(width, height) * 0.38;
+
+    const grad = ctx.createRadialGradient(cx, cy, r * 0.8, cx, cy, r * 1.25);
+    grad.addColorStop(0, 'rgba(15, 76, 74, 0.4)');
+    grad.addColorStop(1, 'rgba(15, 23, 42, 0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 1.25, 0, Math.PI * 2);
+    ctx.fill();
+
+    const globeGrad = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.3, r * 0.1, cx, cy, r);
+    globeGrad.addColorStop(0, '#2dd4bf');
+    globeGrad.addColorStop(0.5, '#0f4c4a');
+    globeGrad.addColorStop(1, '#0f172a');
+    ctx.fillStyle = globeGrad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+    ctx.lineWidth = 1.5;
+    for (let i = -60; i <= 60; i += 30) {
+      const latY = cy + Math.sin(i * Math.PI / 180) * r;
+      const rx = Math.cos(i * Math.PI / 180) * r;
+      ctx.beginPath();
+      ctx.ellipse(cx, latY, rx, rx * 0.3, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    if (!isDragging) angleY += 0.008;
+    ctx.strokeStyle = 'rgba(249, 115, 22, 0.45)';
+    for (let i = 0; i < Math.PI * 2; i += Math.PI / 4) {
+      const currAngle = i + angleY;
+      const rx = Math.sin(currAngle) * r;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, Math.abs(rx), r, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    requestAnimationFrame(drawCanvasGlobe);
+  }
+
+  drawCanvasGlobe();
+}
